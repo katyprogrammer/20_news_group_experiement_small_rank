@@ -3,9 +3,9 @@ import subprocess
 import multiprocessing as mp
 
 def A():
-    subprocess.call('python 20newsgroup.py -r A -d A.pkl -e 10000 > A.txt', shell=True)
+    subprocess.call('python 20newsgroup.py -r A -d A.pkl -e 2000 > A.txt', shell=True)
 def B():
-    subprocess.call('python 20newsgroup.py -r B -d B.pkl -e 10000 > B.txt', shell=True)
+    subprocess.call('python 20newsgroup.py -r B -d B.pkl -e 2000 > B.txt', shell=True)
 
 # runA, runB = mp.Process(target=A), mp.Process(target=B)
 # runA.start()
@@ -14,9 +14,9 @@ def B():
 # runB.join()
 
 def runR(r, i):
-    subprocess.call('python 20newsgroup.py -r B -l A.pkl -d B_{0}.pkl -e 10000 -R {0} > B_{0}_{1}.txt'.format(r, i), shell=True)
+    subprocess.call('python 20newsgroup.py -r B -l A.pkl -d B_{0}.pkl -e 2000 -R {0} > B_{0}_{1}.txt'.format(r, i), shell=True)
 def runRevR(r):
-    subprocess.call('python 20newsgroup.py -r A -l B.pkl -d A_{0}.pkl -e 10000 -R {0} > A_{0}.txt'.format(r), shell=True)
+    subprocess.call('python 20newsgroup.py -r A -l B.pkl -d A_{0}.pkl -e 2000 -R {0} > A_{0}.txt'.format(r), shell=True)
 
 runs = []
 tn = 0
