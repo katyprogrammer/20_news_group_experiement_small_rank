@@ -61,7 +61,7 @@ ROWN, BATCHN = None, None
 HashN = 200
 isDownload = True
 covDone = True
-TARGET  = ['dense_1']
+TARGET  = ['dense_3']
 
 def load_dataset(A_B):
     def download_save_by_category():
