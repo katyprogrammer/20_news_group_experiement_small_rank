@@ -24,16 +24,16 @@ from ttlayer import TTLayer
 '''
 # tuning good hyperparameter using all category
 training all:
-$ python 20newsgroup.py -e 10000 > all.txt
+$ python 20newsgroup.py -e 2000 > all.txt
 
 training domain A(src)
 # save trained params to A.pkl
-$ python 20newsgroup.py -r A -d A.pkl -e 10000 > A.txt
+$ python 20newsgroup.py -r A -d A.pkl -e 2000 > A.txt
 training domain B(tgt)
 # load trained params from A.pkl
-$ python 20newsgroup.py -r B -l A.pkl -d B.pkl -e 10000 > B.txt
+$ python 20newsgroup.py -r B -l A.pkl -d B.pkl -e 2000 > B.txt
 # load low-rank with R rank1 from A.pkl
-$ python 20newsgroup.py -r B -l A.pkl -d B_1.pkl -e 10000 -R 1 > B_1.txt
+$ python 20newsgroup.py -r B -l A.pkl -d B_1.pkl -e 2000 -R 1 > B_1.txt
 
 A.txt, B.txt will contain training information(training error, validation error, validation accuracy)
 $ python plot.py -i A.txt -o A
@@ -41,12 +41,13 @@ $ python plot.py -i B.txt -o B
 '''
 
 def parse_arg():
-    parser = optparse.OptionParser('usage%prog [-l load parameterf from] [-d dump parameter to] [-e epoch] [-r src or tgt]')
+    parser = optparse.OptionParser('usage%prog [-l load parameterf from] [-d dump parameter to] [-e epoch] [-r src or tgt] [-s small or large rank]')
     parser.add_option('-l', dest='fin')
     parser.add_option('-d', dest='fout')
     parser.add_option('-e', dest='epoch')
     parser.add_option('-r', dest='A_B')
     parser.add_option('-R', dest='rank')
+    parser.add_option('-s', dest='small_or_large')
     (options, args) = parser.parse_args()
     return options
 
@@ -157,37 +158,16 @@ def build_mlp(input_var=None):
     l_in = lasagne.layers.InputLayer(shape=(None, HashN),
                                      input_var=input_var)
     l_hid1 = lasagne.layers.DenseLayer(
-            l_in, name='dense_1', num_units=150,
+            l_in, name='dense_1', num_units=200,
             nonlinearity=None)
     l_hid2 = lasagne.layers.DenseLayer(
-            l_hid1, name='dense_2', num_units=100,
+            l_hid1, name='dense_2', num_units=200,
             nonlinearity=None)
     l_hid3 = lasagne.layers.DenseLayer(
-            l_hid2, name='dense_3', num_units=50,
-            nonlinearity=None)
-    l_hid4 = lasagne.layers.DenseLayer(
-            l_hid3, name='dense_4', num_units=50,
-            nonlinearity=None)
-    l_hid5 = lasagne.layers.DenseLayer(
-            l_hid4, name='dense_5', num_units=50,
-            nonlinearity=None)
-    l_hid6 = lasagne.layers.DenseLayer(
-            l_hid5, name='dense_6', num_units=50,
-            nonlinearity=None)
-    l_hid7 = lasagne.layers.DenseLayer(
-            l_hid6, name='dense_7', num_units=50,
-            nonlinearity=None)
-    l_hid8 = lasagne.layers.DenseLayer(
-            l_hid7, name='dense_8', num_units=50,
-            nonlinearity=None)
-    l_hid9 = lasagne.layers.DenseLayer(
-            l_hid8, name='dense_9', num_units=50,
-            nonlinearity=None)
-    l_hid10 = lasagne.layers.DenseLayer(
-            l_hid9, name='dense_10', num_units=50,
+            l_hid2, name='dense_3', num_units=200,
             nonlinearity=None)
     l_out = lasagne.layers.DenseLayer(
-            l_hid10, num_units=20,
+            l_hid3, num_units=20,
             nonlinearity=lasagne.nonlinearities.softmax)
     return l_out
 
@@ -295,7 +275,7 @@ def iterate_minibatches(inputs, targets, batchsize, shuffle=False):
 
 
 # ############################## Main program ##################
-def main(num_epochs=500,fin_params=None,fout_params=None,A_B=None, rank=None):
+def main(num_epochs=10000,fin_params=None,fout_params=None,A_B=None, rank=None, large_small=None):
     print("Loading data...")
     X_train, X_val, X_test, y_train, y_val, y_test = load_dataset(A_B)
     X_train, X_val, X_test = X_train.todense(), X_val.todense(), X_test.todense()
@@ -303,7 +283,6 @@ def main(num_epochs=500,fin_params=None,fout_params=None,A_B=None, rank=None):
     # Prepare Theano variables for inputs and targets
     input_var = T.matrix('inputs')
     target_var = T.ivector('targets')
-
     # Create neural network model.
     print("Building model and compiling functions...")
     network = build_mlp(input_var)
@@ -324,7 +303,7 @@ def main(num_epochs=500,fin_params=None,fout_params=None,A_B=None, rank=None):
     loss = lasagne.objectives.categorical_crossentropy(prediction, target_var)
     loss = loss.mean()
     updates = lasagne.updates.nesterov_momentum(
-            loss, params, learning_rate=1e-3, momentum=0.9)
+            loss, params, learning_rate=1e-2, momentum=0.9)
 
     test_prediction = lasagne.layers.get_output(network, deterministic=True)
     test_loss = lasagne.objectives.categorical_crossentropy(test_prediction,
@@ -389,5 +368,6 @@ if __name__ == '__main__':
         kwargs['fout_params'] = opts.fout
         kwargs['A_B'] = opts.A_B
         kwargs['rank'] = opts.rank
+        kwargs['large_small'] = opts.large_small
 
     main(**kwargs)
