@@ -368,6 +368,6 @@ if __name__ == '__main__':
         kwargs['fout_params'] = opts.fout
         kwargs['A_B'] = opts.A_B
         kwargs['rank'] = opts.rank
-        kwargs['large_small'] = opts.large_small
+        # kwargs['large_small'] = opts.large_small
 
     main(**kwargs)
