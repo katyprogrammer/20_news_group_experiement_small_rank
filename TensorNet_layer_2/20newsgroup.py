@@ -47,7 +47,7 @@ def parse_arg():
     parser.add_option('-e', dest='epoch')
     parser.add_option('-r', dest='A_B')
     parser.add_option('-R', dest='rank')
-    parser.add_option('-s', dest='small_or_large')
+    parser.add_option('-s', dest='large_small')
     (options, args) = parser.parse_args()
     return options
 
