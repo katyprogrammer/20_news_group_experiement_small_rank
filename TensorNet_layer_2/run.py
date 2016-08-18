@@ -14,9 +14,9 @@ def B():
 # runB.join()
 
 def runR(r, i):
-    subprocess.call('THEANO_FLAG=device=gpu0, assert_no_cpu_op=raise, on_unused_input=ignore, floatX=float32, lib__cnmem=0.45, dnn.conv.algo_fwd=time_once,  dnn.conv.algo_bwd=time_once python 20newsgroup.py -r B -l A.pkl -d B_{0}.pkl -e 2000 -R {0} > B_{0}_{1}.txt'.format(r, i), shell=True)
+    subprocess.call('THEANO_FLAGS=mode=FAST_RUN,device=gpu,floatX=float32 python 20newsgroup.py -r B -l A.pkl -d B_{0}.pkl -e 2000 -R {0} -s large > B_{0}_{1}.txt'.format(r, i), shell=True)
 def runRevR(r, i):
-    subprocess.call('THEANO_FLAG=device=gpu0, assert_no_cpu_op=raise, on_unused_input=ignore, floatX=float32, lib__cnmem=0.45, dnn.conv.algo_fwd=time_once,  dnn.conv.algo_bwd=time_once python 20newsgroup.py -r A -l B.pkl -d A_{0}.pkl -e 2000 -R {0} > A_{0}_{1}.txt'.format(r), shell=True)
+    subprocess.call('THEANO_FLAGS=mode=FAST_RUN,device=gpu,floatX=float32 python 20newsgroup.py -r A -l B.pkl -d A_{0}.pkl -e 2000 -R {0} -s large > A_{0}_{1}.txt'.format(r), shell=True)
 
 runs = []
 tn = 0
